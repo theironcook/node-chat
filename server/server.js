@@ -14,6 +14,24 @@ const io = socketIO(server);
 io.on('connection', (socket) => {
   console.log(`new user connected`); 
 
+  socket.emit('newEmail', {
+    from: 'bart@wood.com',
+    text: 'wut up yo!?',
+    createAt: Date.now()
+  });
+
+  socket.on('createEmail', (newEmail) => {
+    console.log(`createEmail ${JSON.stringify(newEmail, undefined, 2)}`);
+  });
+
+  socket.on('createMessage', (message) => {
+    io.emit('newMessage', {
+      from: message.from,
+      text: message.text,
+      createdAt: Date.now()
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('client disconnected');
   });
