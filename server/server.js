@@ -14,22 +14,45 @@ const io = socketIO(server);
 io.on('connection', (socket) => {
   console.log(`new user connected`); 
 
-  socket.emit('newEmail', {
-    from: 'bart@wood.com',
-    text: 'wut up yo!?',
-    createAt: Date.now()
+  // socket.emit('newEmail', {
+  //   from: 'bart@wood.com',
+  //   text: 'wut up yo!?',
+  //   createAt: Date.now()
+  // });
+
+  // send a welcome to the new user
+  socket.emit('newMessage', {
+    from: 'Admin',
+    text: 'Welcome to the chat beotch!',
+    createdAt: Date.now()
   });
+
+  // tell everyone else that a new user just joined the chat
+  socket.broadcast.emit('newMessage', {
+    from: 'Admin',
+    text: 'Some turd just joined',
+    createdAt: Date.now()
+  });
+
 
   socket.on('createEmail', (newEmail) => {
     console.log(`createEmail ${JSON.stringify(newEmail, undefined, 2)}`);
   });
 
-  socket.on('createMessage', (message) => {
-    io.emit('newMessage', {
+  socket.on('createMessage', (message) => {  
+    
+    // to everyone but this single socket
+    socket.broadcast.emit('newMessage', {
       from: message.from,
       text: message.text,
       createdAt: Date.now()
     });
+    
+    // io.emit('newMessage', {
+    //   from: message.from,
+    //   text: message.text,
+    //   createdAt: Date.now()
+    // });
   });
 
   socket.on('disconnect', () => {
